@@ -7,29 +7,24 @@ import org.opencv.calib3d.StereoSGBM;
 OpenCV ocvL, ocvR;
 PGraphics gfxL, gfxR;
 PImage img, depth1, depth2;
-PShader shader_blur;
+int scaler = 3;
 
 void setup() {
   size(50, 50, P2D);
-  img = loadImage("mountain.jpg");
-  surface.setSize(img.width, img.height);
+  img = loadImage("dog.jpg");
+  surface.setSize((img.width/scaler)*2, (img.height/scaler)*2);
   
-  shader_blur = loadShader("lchannel.glsl");
-  shader_blur.set("blurSize", 9);
-  shader_blur.set("horizontalPass", 1);
-  shader_blur.set("sigma", 5.0); 
+  setupShaders();
+  updateShaders();
   
   gfxL = createGraphics(img.width, img.height, P2D);
   gfxL.beginDraw();
-  gfxL.tint(255, 0, 0);
-  shader_blur.set("texture", img);
-  gfxL.filter(shader_blur);
+  gfxL.filter(shader_lchannel);
   gfxL.endDraw();
   
   gfxR = createGraphics(img.width, img.height, P2D);
   gfxR.beginDraw();
-  gfxR.tint(0, 255, 255);
-  gfxR.image(img, 0, 0);
+  gfxR.filter(shader_rchannel);
   gfxR.endDraw();  
   
   ocvL = new OpenCV(this, gfxL);
@@ -55,14 +50,24 @@ void setup() {
   stereo2.compute(left, right, disparity );
   disparity.convertTo(depthMat, depthMat.type());
 
-
   depth2 = createImage(depthMat.width(), depthMat.height(), RGB);
   ocvL.toPImage(depthMat, depth2);
+  
+  // just for display
+  gfxL.beginDraw();
+  gfxL.tint(255,0,0);
+  gfxL.image(gfxL,0,0);
+  gfxL.endDraw();
+  
+  gfxR.beginDraw();
+  gfxR.tint(0,255,255);
+  gfxR.image(gfxR,0,0);
+  gfxR.endDraw(); 
 }
 
 void draw() {
-  int w = img.width/2;
-  int h = img.height/2;
+  int w = img.width/scaler;
+  int h = img.height/scaler;
   image(gfxL, 0, 0, w, h);
   image(gfxR, w, 0, w, h);
 
@@ -74,4 +79,8 @@ void draw() {
   text("right", 10 + gfxL.width, 20);
   text("stereo SGBM", 10, gfxL.height + 20);
   text("stereo BM", 10 + gfxL.width, gfxL.height+ 20);
+}
+
+void keyPressed() {
+  saveFrame("test.jpg");
 }
