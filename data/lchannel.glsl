@@ -21,7 +21,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
     vec2 uv = fragCoord.xy / iResolution.xy;
     uv = vec2(uv.x, 1.0-uv.y);
 
-    fragColor = texture2D(tex0, uv) * vec4(1,0,0,1);
+    fragColor = texture2D(tex0, uv);
     fragColor = desaturate(fragColor.rgb);
 }
 

@@ -8,6 +8,7 @@ OpenCV ocvL, ocvR;
 PGraphics gfxL, gfxR;
 PImage img, depth1, depth2;
 int scaler = 3;
+boolean tintImages = true;
 
 void setup() {
   size(50, 50, P2D);
@@ -53,16 +54,18 @@ void setup() {
   depth2 = createImage(depthMat.width(), depthMat.height(), RGB);
   ocvL.toPImage(depthMat, depth2);
   
-  // just for display
-  gfxL.beginDraw();
-  gfxL.tint(255,0,0);
-  gfxL.image(gfxL,0,0);
-  gfxL.endDraw();
-  
-  gfxR.beginDraw();
-  gfxR.tint(0,255,255);
-  gfxR.image(gfxR,0,0);
-  gfxR.endDraw(); 
+  if (tintImages) {
+    // just for display
+    gfxL.beginDraw();
+    gfxL.tint(255,0,0);
+    gfxL.image(gfxL,0,0);
+    gfxL.endDraw();
+    
+    gfxR.beginDraw();
+    gfxR.tint(0,255,255);
+    gfxR.image(gfxR,0,0);
+    gfxR.endDraw(); 
+  }
 }
 
 void draw() {
@@ -76,9 +79,14 @@ void draw() {
 
   fill(255, 0, 0);
   text("left", 10, 20);
-  text("right", 10 + gfxL.width, 20);
-  text("stereo SGBM", 10, gfxL.height + 20);
-  text("stereo BM", 10 + gfxL.width, gfxL.height+ 20);
+  fill(0, 255, 255);
+  text("right", 10 + gfxL.width / scaler, 20);
+  fill(0);
+  text("stereo SGBM", 11, gfxL.height / scaler + 21);
+  text("stereo BM", 11 + gfxL.width / scaler, gfxL.height / scaler + 21);
+  fill(127,255,127);
+  text("stereo SGBM", 10, gfxL.height / scaler + 20);
+  text("stereo BM", 10 + gfxL.width / scaler, gfxL.height / scaler + 20);
 }
 
 void keyPressed() {
